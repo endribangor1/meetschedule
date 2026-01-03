@@ -1907,6 +1907,623 @@
             will-change: transform;
             transform: translateZ(0);
         }
+
+        /* ========== CALENDAR VIEW STYLES ========== */
+
+        /* Calendar FAB Button */
+        .calendar-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 100px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            animation: bounceIn 0.6s ease-out 0.3s backwards;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .calendar-fab:hover {
+            transform: scale(1.15) translateY(-5px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+        }
+
+        .calendar-fab:active {
+            transform: scale(0.95);
+        }
+
+        .calendar-fab svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .calendar-fab-text {
+            position: absolute;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .calendar-fab:hover .calendar-fab-text {
+            opacity: 1;
+        }
+
+        /* Calendar Overlay */
+        .calendar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calendar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-radius: 24px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-overlay.active .calendar-container {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Calendar Header */
+        .calendar-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .calendar-nav-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+        }
+
+        .calendar-month-year {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .calendar-close-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-close-btn:hover {
+            background: rgba(239, 68, 68, 0.5);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        /* Calendar Body */
+        .calendar-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Weekday Headers */
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #94a3b8;
+            padding: 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .calendar-weekday.weekend {
+            color: #f87171;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        /* Calendar Day Cell */
+        .calendar-day {
+            min-height: 120px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            padding: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.4;
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        .calendar-day.today {
+            border: 2px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .calendar-day.today::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+        }
+
+        .calendar-day.weekend {
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .calendar-day-number {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .calendar-day.today .calendar-day-number {
+            color: #10b981;
+        }
+
+        .calendar-day.weekend .calendar-day-number {
+            color: #f87171;
+        }
+
+        /* Meeting Pills Container */
+        .calendar-meetings {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .calendar-meetings::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .calendar-meetings::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .calendar-meetings::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 3px;
+        }
+
+        /* Meeting Pill */
+        .calendar-meeting-pill {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-meeting-pill:hover {
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .calendar-meeting-pill .meeting-room {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .calendar-meeting-pill .meeting-info {
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Room Color Coding */
+        .calendar-meeting-pill.room-ningrat {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(52, 211, 153, 0.2));
+            border-left: 3px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        .calendar-meeting-pill.room-juragan {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));
+            border-left: 3px solid #3b82f6;
+            color: #93c5fd;
+        }
+
+        .calendar-meeting-pill.room-risk-taker {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(248, 113, 113, 0.2));
+            border-left: 3px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        .calendar-meeting-pill.room-gym {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.2));
+            border-left: 3px solid #f59e0b;
+            color: #fcd34d;
+        }
+
+        .calendar-meeting-pill.room-canteen {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(192, 132, 252, 0.2));
+            border-left: 3px solid #a855f7;
+            color: #d8b4fe;
+        }
+
+        .calendar-meeting-pill.room-lounge {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(244, 114, 182, 0.2));
+            border-left: 3px solid #ec4899;
+            color: #f9a8d4;
+        }
+
+        .calendar-meeting-pill.room-default {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(129, 140, 248, 0.2));
+            border-left: 3px solid #6366f1;
+            color: #a5b4fc;
+        }
+
+        /* More Meetings Indicator */
+        .calendar-more-meetings {
+            font-size: 0.7em;
+            color: #94a3b8;
+            text-align: center;
+            padding: 4px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-more-meetings:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        /* Meeting Detail Tooltip */
+        .meeting-tooltip {
+            position: fixed;
+            z-index: 4000;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            border-radius: 12px;
+            padding: 16px;
+            min-width: 250px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .meeting-tooltip.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .meeting-tooltip-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .meeting-tooltip-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .meeting-tooltip-row .icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .meeting-tooltip-row .label {
+            color: #94a3b8;
+            min-width: 70px;
+        }
+
+        .meeting-tooltip-row .value {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        /* Calendar Loading */
+        .calendar-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            gap: 20px;
+        }
+
+        .calendar-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Today Button */
+        .calendar-today-btn {
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            border-radius: 8px;
+            color: #10b981;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-today-btn:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Calendar Legend */
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .calendar-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75em;
+            color: #94a3b8;
+        }
+
+        .calendar-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* Responsive Calendar */
+        @media (max-width: 1024px) {
+            .calendar-day {
+                min-height: 100px;
+            }
+
+            .calendar-meeting-pill {
+                font-size: 0.65em;
+            }
+
+            .calendar-month-year {
+                font-size: 1.4em;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-fab {
+                right: 30px;
+                bottom: 100px;
+            }
+
+            .calendar-overlay {
+                padding: 10px;
+            }
+
+            .calendar-container {
+                max-height: 95vh;
+                border-radius: 16px;
+            }
+
+            .calendar-header {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .calendar-nav {
+                order: 2;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .calendar-close-btn {
+                order: 1;
+                position: absolute;
+                right: 15px;
+                top: 15px;
+            }
+
+            .calendar-body {
+                padding: 10px;
+            }
+
+            .calendar-weekdays {
+                gap: 4px;
+            }
+
+            .calendar-weekday {
+                font-size: 0.7em;
+                padding: 8px 0;
+            }
+
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                min-height: 70px;
+                padding: 6px;
+                border-radius: 8px;
+            }
+
+            .calendar-day-number {
+                font-size: 0.85em;
+                margin-bottom: 4px;
+            }
+
+            .calendar-meetings {
+                max-height: 45px;
+            }
+
+            .calendar-meeting-pill {
+                padding: 3px 5px;
+                font-size: 0.6em;
+            }
+
+            .calendar-meeting-pill .meeting-info {
+                display: none;
+            }
+
+            .calendar-legend {
+                display: none;
+            }
+
+            .calendar-month-year {
+                font-size: 1.2em;
+            }
+
+            .calendar-nav-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 55px;
+                padding: 4px;
+            }
+
+            .calendar-day-number {
+                font-size: 0.75em;
+            }
+
+            .calendar-meeting-pill {
+                padding: 2px 4px;
+                font-size: 0.55em;
+                border-left-width: 2px;
+            }
+
+            .calendar-meeting-pill .meeting-room {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
     </style>
 </head>
 
@@ -2109,6 +2726,99 @@
         </svg>
     </div>
 
+    <!-- Calendar Floating Action Button -->
+    <div class="calendar-fab" onclick="showCalendarView()">
+        <span class="calendar-fab-text">Lihat Kalender Booking</span>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z" />
+        </svg>
+    </div>
+
+    <!-- Calendar View Overlay -->
+    <div class="calendar-overlay" id="calendarOverlay" onclick="closeCalendarView(event)">
+        <div class="calendar-container" onclick="event.stopPropagation()">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="navigateCalendar(-1)">‹</button>
+                    <span class="calendar-month-year" id="calendarMonthYear">Januari 2026</span>
+                    <button class="calendar-nav-btn" onclick="navigateCalendar(1)">›</button>
+                    <button class="calendar-today-btn" onclick="goToToday()">Hari Ini</button>
+                </div>
+                <button class="calendar-close-btn" onclick="closeCalendarView()">✕</button>
+            </div>
+            <div class="calendar-body">
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday weekend">Min</div>
+                    <div class="calendar-weekday">Sen</div>
+                    <div class="calendar-weekday">Sel</div>
+                    <div class="calendar-weekday">Rab</div>
+                    <div class="calendar-weekday">Kam</div>
+                    <div class="calendar-weekday">Jum</div>
+                    <div class="calendar-weekday weekend">Sab</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar days will be generated by JavaScript -->
+                </div>
+            </div>
+            <div class="calendar-legend">
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #10b981;"></div>
+                    <span>Ningrat</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #3b82f6;"></div>
+                    <span>Juragan</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #ef4444;"></div>
+                    <span>Risk Taker</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #f59e0b;"></div>
+                    <span>Gym</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #a855f7;"></div>
+                    <span>Canteen</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #ec4899;"></div>
+                    <span>Lounge</span>
+                </div>
+                <div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: #6366f1;"></div>
+                    <span>Lainnya</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meeting Tooltip -->
+    <div class="meeting-tooltip" id="meetingTooltip">
+        <div class="meeting-tooltip-title" id="tooltipTitle">Meeting Title</div>
+        <div class="meeting-tooltip-row">
+            <span class="icon">📍</span>
+            <span class="label">Ruangan:</span>
+            <span class="value" id="tooltipRoom">-</span>
+        </div>
+        <div class="meeting-tooltip-row">
+            <span class="icon">📅</span>
+            <span class="label">Tanggal:</span>
+            <span class="value" id="tooltipDate">-</span>
+        </div>
+        <div class="meeting-tooltip-row">
+            <span class="icon">🕐</span>
+            <span class="label">Waktu:</span>
+            <span class="value" id="tooltipTime">-</span>
+        </div>
+        <div class="meeting-tooltip-row">
+            <span class="icon">👤</span>
+            <span class="label">PIC:</span>
+            <span class="value" id="tooltipPic">-</span>
+        </div>
+    </div>
+
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" onclick="closeSidebar()"></div>
 
@@ -2204,6 +2914,40 @@
                             <div class="booking-form-group">
                                 <label for="bookingEndTime">Jam Selesai *</label>
                                 <input type="time" id="bookingEndTime" required onchange="checkBookingAvailability()">
+                            </div>
+                        </div>
+
+                        <!-- Recurring Booking Section -->
+                        <div class="booking-form-group"
+                            style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                <input type="checkbox" id="isRecurring"
+                                    style="width: auto; margin: 0; transform: scale(1.2);"
+                                    onchange="toggleRecurringOptions()">
+                                <label for="isRecurring" style="margin: 0; cursor: pointer; color: #34d399;">Booking
+                                    Berulang (Rutin)</label>
+                            </div>
+                            <div class="booking-hint" style="margin-left: 26px;">Centang jika meeting ini diadakan
+                                secara rutin</div>
+
+                            <div id="recurringOptions"
+                                style="display: none; margin-top: 15px; padding-left: 10px; border-left: 2px solid #34d399;">
+                                <div class="booking-form-row">
+                                    <div class="booking-form-group">
+                                        <label for="recurringFrequency">Frekuensi *</label>
+                                        <select id="recurringFrequency"
+                                            style="padding: 10px 15px; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 8px; background: rgba(30, 41, 59, 0.8); color: #f1f5f9; width: 100%;">
+                                            <option value="daily">Harian (Setiap Hari)</option>
+                                            <option value="weekly">Mingguan (Setiap Minggu)</option>
+                                            <option value="monthly">Bulanan (Setiap Bulan)</option>
+                                        </select>
+                                    </div>
+                                    <div class="booking-form-group">
+                                        <label for="recurringUntil">Sampai Tanggal *</label>
+                                        <input type="date" id="recurringUntil">
+                                    </div>
+                                </div>
+                                <div class="booking-hint">Maksimal 3 bulan ke depan</div>
                             </div>
                         </div>
 
@@ -3039,6 +3783,11 @@
             document.getElementById('bookingSuccessContent').style.display = 'none';
             document.getElementById('availabilityStatus').classList.remove('show', 'available', 'unavailable');
 
+            // Reset recurring fields
+            document.getElementById('isRecurring').checked = false;
+            document.getElementById('recurringOptions').style.display = 'none';
+            document.getElementById('recurringUntil').value = '';
+
             modal.classList.add('active');
         }
 
@@ -3104,39 +3853,106 @@
             const notes = document.getElementById('bookingNotes').value;
             const errorDiv = document.getElementById('bookingError');
 
-            // Validate - lebih detail untuk debugging
-            if (!room || !name || !phone || !date || !startTime || !endTime || !title || !people) {
-                let missingFields = [];
-                if (!room) missingFields.push('Ruangan');
-                if (!name) missingFields.push('Nama');
-                if (!phone) missingFields.push('No. Telepon');
-                if (!date) missingFields.push('Tanggal');
-                if (!startTime) missingFields.push('Jam Mulai');
-                if (!endTime) missingFields.push('Jam Selesai');
-                if (!title) missingFields.push('Judul Meeting');
-                if (!people) missingFields.push('Jumlah Orang');
+            // Recurring Booking Logic
+            const isRecurring = document.getElementById('isRecurring').checked;
+            let bookingDates = [date]; // Default single date
 
-                errorDiv.textContent = `Harap isi: ${missingFields.join(', ')}`;
-                errorDiv.style.display = 'block';
-                console.log('Missing fields:', missingFields);
-                return;
-            }
+            if (isRecurring) {
+                const frequency = document.getElementById('recurringFrequency').value;
+                const untilDate = document.getElementById('recurringUntil').value;
 
-            try {
-                // Check availability one more time
-                const allData = await loadAllData();
-                const normalizedDate = parseDate(date);
-
-                const conflicts = allData.filter(booking =>
-                    booking.room === room &&
-                    booking.date === normalizedDate &&
-                    !(endTime <= booking.startTime || startTime >= booking.endTime)
-                );
-
-                if (conflicts.length > 0) {
-                    errorDiv.textContent = 'Maaf, ruangan sudah dipesan di jam tersebut. Silakan periksa ketersediaan lagi.';
+                if (!untilDate) {
+                    errorDiv.textContent = 'Harap tentukan tanggal akhir untuk booking berulang';
                     errorDiv.style.display = 'block';
                     return;
+                }
+
+                if (new Date(untilDate) <= new Date(date)) {
+                    errorDiv.textContent = 'Tanggal akhir harus setelah tanggal mulai';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                bookingDates = generateRecurringDates(date, frequency, untilDate);
+
+                if (bookingDates.length > 50) {
+                    errorDiv.textContent = `Terlalu banyak booking (${bookingDates.length}). Maksimal 50 booking sekaligus. Harap kurangi rentang waktu.`;
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Show processing status
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Memproses...';
+            errorDiv.style.display = 'none';
+
+            try {
+                // Check availability for ALL dates first
+                const allData = await loadAllData();
+                let conflictsFound = [];
+
+                for (const bookingDate of bookingDates) {
+                    const normalizedDate = parseDate(bookingDate);
+                    const conflicts = allData.filter(booking =>
+                        booking.room === room &&
+                        booking.date === normalizedDate &&
+                        !(endTime <= booking.startTime || startTime >= booking.endTime)
+                    );
+
+                    if (conflicts.length > 0) {
+                        const dateObj = new Date(bookingDate);
+                        const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                        conflictsFound.push(`${dateStr} (${conflicts[0].startTime}-${conflicts[0].endTime})`);
+                    }
+                }
+
+                if (conflictsFound.length > 0) {
+                    errorDiv.innerHTML = `<strong>Gagal:</strong> Terdapat bentrok jadwal pada tanggal berikut:<br>${conflictsFound.slice(0, 3).join('<br>')}${conflictsFound.length > 3 ? '<br>...dan lainnya' : ''}`;
+                    errorDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    return;
+                }
+
+                // If no conflicts, proceed to submit all
+                let successCount = 0;
+
+                // Update UI to show progress
+                submitBtn.textContent = `Mengirim 1/${bookingDates.length}...`;
+
+                for (let i = 0; i < bookingDates.length; i++) {
+                    const bDate = bookingDates[i];
+                    submitBtn.textContent = `Mengirim ${i + 1}/${bookingDates.length}...`;
+
+                    // Prepare booking object
+                    const currentBookingData = {
+                        room,
+                        name,
+                        phone,
+                        date: bDate,
+                        startTime,
+                        endTime,
+                        title: isRecurring ? `${title} (Rutin ${i + 1}/${bookingDates.length})` : title,
+                        people,
+                        notes,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // 1. Save to LocalStorage
+                    let bookings = JSON.parse(localStorage.getItem('pendingBookings')) || [];
+                    bookings.push(currentBookingData);
+                    localStorage.setItem('pendingBookings', JSON.stringify(bookings));
+
+                    // 2. Send to Google Sheets
+                    await sendToGoogleSheets(currentBookingData);
+
+                    successCount++;
+
+                    // Small delay to be nice to the server/network
+                    if (bookingDates.length > 1) await new Promise(r => setTimeout(r, 500));
                 }
 
                 // Format date for display
@@ -3155,79 +3971,82 @@
 
                 document.getElementById('successRoom').textContent = room;
                 document.getElementById('successName').textContent = name;
-                document.getElementById('successDate').textContent = formattedDate;
+                document.getElementById('successDate').textContent = isRecurring ? `${formattedDate} s/d ${document.getElementById('recurringUntil').value} (${successCount}x pertemuan)` : formattedDate;
                 document.getElementById('successTime').textContent = `${startTime} - ${endTime}`;
                 document.getElementById('successTitle').textContent = title;
 
-                // Save to localStorage for backup
-                const bookingData = {
-                    room,
-                    name,
-                    phone,
-                    date,
-                    startTime,
-                    endTime,
-                    title,
-                    people,
-                    notes,
-                    timestamp: new Date().toISOString()
-                };
-
-                // Format tanggal ke DD-MM-YYYY untuk match dengan format spreadsheet
-                const [yearStr, monthStr, dayStr] = date.split('-');
-                const formattedDateForSheet = `${dayStr}-${monthStr}-${yearStr}`;
-
-                // Send to Google Sheets via Apps Script
-                const deploymentUrl = 'https://script.google.com/macros/s/AKfycbwQaSE7iUlbbMj-j_lzmKfsqKX9MKARTQ2pu6i4P0uHDHFhKLf3xJFyVfMin6pI6aHv2Q/exec';
-                if (deploymentUrl !== 'PASTE_DEPLOYMENT_URL_HERE') {
-                    try {
-                        // Gunakan field names yang match dengan kolom spreadsheet:
-                        // Ruangan | Tanggal | Jam Mulai | Jam Selesai | Judul Meeting | PIC/Nama Pemesan | Catatan
-                        const formData = new FormData();
-                        formData.append('Ruangan', room);
-                        formData.append('Tanggal', formattedDateForSheet);
-                        formData.append('Jam Mulai', startTime);
-                        formData.append('Jam Selesai', endTime);
-                        formData.append('Judul Meeting', title);
-                        formData.append('PIC/Nama Pemesan', name);
-                        formData.append('Catatan', notes || '');
-                        // Gunakan URL params untuk bypass CORS (GET request via image)
-                        const params = new URLSearchParams();
-                        params.append('Ruangan', room);
-                        params.append('Tanggal', formattedDateForSheet);
-                        params.append('JamMulai', startTime);
-                        params.append('JamSelesai', endTime);
-                        params.append('JudulMeeting', title);
-                        params.append('PIC', name);
-                        params.append('NoTelpon', phone);
-                        params.append('Catatan', notes || '');
-
-                        const fullUrl = `${deploymentUrl}?${params.toString()}`;
-
-                        // Gunakan image beacon untuk bypass CORS completely
-                        const img = new Image();
-                        img.onload = () => console.log('✅ Booking berhasil dikirim ke Google Sheets');
-                        img.onerror = () => console.log('✅ Booking dikirim (response tidak bisa dibaca karena CORS, tapi data tetap masuk)');
-                        img.src = fullUrl;
-
-                        console.log('📤 Mengirim booking ke:', fullUrl);
-                    } catch (error) {
-                        console.warn('⚠️ Tidak bisa kirim ke Sheets (akan disimpan di localStorage):', error);
-                    }
-                } else {
-                    console.log('⚠️ Deployment URL belum diset. Booking hanya disimpan di localStorage.');
-                }
-
-                let bookings = JSON.parse(localStorage.getItem('pendingBookings')) || [];
-                bookings.push(bookingData);
-                localStorage.setItem('pendingBookings', JSON.stringify(bookings));
-
-                console.log('Booking data saved:', bookingData);
+                console.log('All bookings saved:', successCount);
 
             } catch (error) {
                 console.error('Error submitting booking:', error);
                 errorDiv.textContent = 'Terjadi kesalahan saat mengirim booking. Silakan coba lagi.';
                 errorDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        }
+
+        // Helper: Generate Recurring Dates
+        function generateRecurringDates(startDateStr, frequency, untilDateStr) {
+            const dates = [];
+            let currentDate = new Date(startDateStr);
+            const endDate = new Date(untilDateStr);
+
+            // Safety check
+            if (currentDate > endDate) return dates;
+
+            while (currentDate <= endDate) {
+                // Add current date to list (formatted as YYYY-MM-DD)
+                const y = currentDate.getFullYear();
+                const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const d = String(currentDate.getDate()).padStart(2, '0');
+                dates.push(`${y}-${m}-${d}`);
+
+                // Increment date based on frequency
+                if (frequency === 'daily') {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                } else if (frequency === 'weekly') {
+                    currentDate.setDate(currentDate.getDate() + 7);
+                } else if (frequency === 'monthly') {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+
+                // Safety break
+                if (dates.length > 100) break;
+            }
+
+            return dates;
+        }
+
+        // Helper: Send single booking to Google Sheets
+        async function sendToGoogleSheets(data) {
+            const deploymentUrl = 'https://script.google.com/macros/s/AKfycbwQaSE7iUlbbMj-j_lzmKfsqKX9MKARTQ2pu6i4P0uHDHFhKLf3xJFyVfMin6pI6aHv2Q/exec';
+
+            if (deploymentUrl === 'PASTE_DEPLOYMENT_URL_HERE') return;
+
+            try {
+                // Format tanggal ke DD-MM-YYYY untuk spreadsheet
+                const [yearStr, monthStr, dayStr] = data.date.split('-');
+                const formattedDateForSheet = `${dayStr}-${monthStr}-${yearStr}`;
+
+                const params = new URLSearchParams();
+                params.append('Ruangan', data.room);
+                params.append('Tanggal', formattedDateForSheet);
+                params.append('JamMulai', data.startTime);
+                params.append('JamSelesai', data.endTime);
+                params.append('JudulMeeting', data.title);
+                params.append('PIC', data.name);
+                params.append('NoTelpon', data.phone);
+                params.append('Catatan', data.notes || '');
+
+                const fullUrl = `${deploymentUrl}?${params.toString()}`;
+
+                // Use fetch with no-cors to support async await better than Image
+                await fetch(fullUrl, { method: 'GET', mode: 'no-cors' });
+                console.log('✅ Sent to Sheets:', data.date);
+            } catch (error) {
+                console.warn('⚠️ Gagal kirim ke Sheets:', error);
+                // Don't throw, let it continue saving to local storage
             }
         }
 
@@ -3455,6 +4274,284 @@
             setTimeout(() => {
                 updateRoomCardsOnScroll();
             }, 500);
+        }
+
+        function toggleRecurringOptions() {
+            const isRecurring = document.getElementById('isRecurring').checked;
+            const optionsDiv = document.getElementById('recurringOptions');
+            const untilInput = document.getElementById('recurringUntil');
+
+            if (isRecurring) {
+                optionsDiv.style.display = 'block';
+                // Set default until date to 1 week from now
+                if (!untilInput.value) {
+                    const today = new Date();
+                    const nextWeek = new Date(today);
+                    nextWeek.setDate(today.getDate() + 7);
+
+                    const year = nextWeek.getFullYear();
+                    const month = String(nextWeek.getMonth() + 1).padStart(2, '0');
+                    const day = String(nextWeek.getDate()).padStart(2, '0');
+                    untilInput.value = `${year}-${month}-${day}`;
+                }
+            } else {
+                optionsDiv.style.display = 'none';
+            }
+        }
+
+        // ========== CALENDAR VIEW FUNCTIONS ==========
+
+        // Calendar state
+        let currentCalendarYear = new Date().getFullYear();
+        let currentCalendarMonth = new Date().getMonth();
+        let calendarMeetingsData = [];
+
+        // Month names in Indonesian
+        const monthNames = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        // Room color mapping
+        function getRoomColorClass(roomName) {
+            const roomLower = roomName.toLowerCase();
+            if (roomLower.includes('ningrat')) return 'room-ningrat';
+            if (roomLower.includes('juragan')) return 'room-juragan';
+            if (roomLower.includes('risk') || roomLower.includes('taker')) return 'room-risk-taker';
+            if (roomLower.includes('gym')) return 'room-gym';
+            if (roomLower.includes('canteen') || roomLower.includes('kantin')) return 'room-canteen';
+            if (roomLower.includes('lounge')) return 'room-lounge';
+            return 'room-default';
+        }
+
+        // Show calendar view
+        async function showCalendarView() {
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Load and render calendar for current month
+            await renderCalendar(currentCalendarYear, currentCalendarMonth);
+        }
+
+        // Close calendar view
+        function closeCalendarView(event) {
+            if (event && event.target !== document.getElementById('calendarOverlay')) {
+                return;
+            }
+            const overlay = document.getElementById('calendarOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+
+            // Hide tooltip
+            document.getElementById('meetingTooltip').classList.remove('active');
+        }
+
+        // Navigate calendar months
+        async function navigateCalendar(direction) {
+            currentCalendarMonth += direction;
+
+            if (currentCalendarMonth > 11) {
+                currentCalendarMonth = 0;
+                currentCalendarYear++;
+            } else if (currentCalendarMonth < 0) {
+                currentCalendarMonth = 11;
+                currentCalendarYear--;
+            }
+
+            await renderCalendar(currentCalendarYear, currentCalendarMonth);
+        }
+
+        // Go to today
+        async function goToToday() {
+            const today = new Date();
+            currentCalendarYear = today.getFullYear();
+            currentCalendarMonth = today.getMonth();
+            await renderCalendar(currentCalendarYear, currentCalendarMonth);
+        }
+
+        // Render calendar grid
+        async function renderCalendar(year, month) {
+            const grid = document.getElementById('calendarGrid');
+            const monthYearLabel = document.getElementById('calendarMonthYear');
+
+            // Update month/year label
+            monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+
+            // Show loading state
+            grid.innerHTML = '<div class="calendar-loading"><div class="spinner"></div><p>Memuat data...</p></div>';
+
+            // Load meeting data
+            try {
+                calendarMeetingsData = await loadAllData(true);
+            } catch (error) {
+                console.error('Error loading calendar data:', error);
+                calendarMeetingsData = [];
+            }
+
+            // Generate calendar grid
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay(); // 0 = Sunday
+
+            // Get today for comparison
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            let html = '';
+
+            // Previous month days
+            const prevMonth = month === 0 ? 11 : month - 1;
+            const prevYear = month === 0 ? year - 1 : year;
+            const daysInPrevMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const isWeekend = (startingDayOfWeek - i - 1) === 0 || (startingDayOfWeek - i - 1) === 6;
+                html += `
+                    <div class="calendar-day other-month ${isWeekend ? 'weekend' : ''}">
+                        <div class="calendar-day-number">${day}</div>
+                        <div class="calendar-meetings"></div>
+                    </div>
+                `;
+            }
+
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayOfWeek = new Date(year, month, day).getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isToday = dateStr === todayStr;
+
+                // Get meetings for this day
+                const dayMeetings = calendarMeetingsData.filter(m => m.date === dateStr);
+
+                // Sort meetings by start time
+                dayMeetings.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+                let meetingsHtml = '';
+                const maxDisplay = 3;
+                const displayMeetings = dayMeetings.slice(0, maxDisplay);
+                const remainingCount = dayMeetings.length - maxDisplay;
+
+                displayMeetings.forEach((meeting, index) => {
+                    const colorClass = getRoomColorClass(meeting.room);
+                    const meetingData = encodeURIComponent(JSON.stringify(meeting));
+                    meetingsHtml += `
+                        <div class="calendar-meeting-pill ${colorClass}" 
+                             onmouseenter="showMeetingTooltip(event, '${meetingData}')"
+                             onmouseleave="hideMeetingTooltip()"
+                             onclick="showScheduleFromCalendar('${meeting.room}')">
+                            <span class="meeting-room">📍 ${meeting.room}</span>
+                            <span class="meeting-info">${meeting.pic} • ${meeting.startTime}</span>
+                        </div>
+                    `;
+                });
+
+                if (remainingCount > 0) {
+                    meetingsHtml += `
+                        <div class="calendar-more-meetings" onclick="showDayDetails('${dateStr}')">
+                            +${remainingCount} lainnya
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="calendar-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''} ${dayMeetings.length > 0 ? 'has-meetings' : ''}">
+                        <div class="calendar-day-number">${day}</div>
+                        <div class="calendar-meetings">
+                            ${meetingsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Next month days to complete the grid (always show 6 rows = 42 cells)
+            const totalCells = startingDayOfWeek + daysInMonth;
+            const remainingCells = 42 - totalCells;
+
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayOfWeek = (totalCells + day - 1) % 7;
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                html += `
+                    <div class="calendar-day other-month ${isWeekend ? 'weekend' : ''}">
+                        <div class="calendar-day-number">${day}</div>
+                        <div class="calendar-meetings"></div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        // Show meeting tooltip on hover
+        function showMeetingTooltip(event, encodedData) {
+            try {
+                const meeting = JSON.parse(decodeURIComponent(encodedData));
+                const tooltip = document.getElementById('meetingTooltip');
+
+                document.getElementById('tooltipTitle').textContent = meeting.title || 'Meeting';
+                document.getElementById('tooltipRoom').textContent = meeting.room;
+                document.getElementById('tooltipDate').textContent = formatDateForDisplay(meeting.date);
+                document.getElementById('tooltipTime').textContent = `${meeting.startTime} - ${meeting.endTime}`;
+                document.getElementById('tooltipPic').textContent = meeting.pic;
+
+                // Position tooltip
+                const rect = event.target.getBoundingClientRect();
+                let left = rect.right + 10;
+                let top = rect.top;
+
+                // Adjust if tooltip goes off screen
+                if (left + 260 > window.innerWidth) {
+                    left = rect.left - 260;
+                }
+                if (top + 150 > window.innerHeight) {
+                    top = window.innerHeight - 160;
+                }
+
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
+                tooltip.classList.add('active');
+            } catch (e) {
+                console.error('Error showing tooltip:', e);
+            }
+        }
+
+        // Hide meeting tooltip
+        function hideMeetingTooltip() {
+            document.getElementById('meetingTooltip').classList.remove('active');
+        }
+
+        // Show schedule from calendar (clicking on a meeting pill)
+        function showScheduleFromCalendar(room) {
+            closeCalendarView();
+            setTimeout(() => {
+                showSchedule(room);
+            }, 300);
+        }
+
+        // Show all meetings for a specific day
+        function showDayDetails(dateStr) {
+            const dayMeetings = calendarMeetingsData.filter(m => m.date === dateStr);
+
+            if (dayMeetings.length === 0) return;
+
+            // Create an alert or modal with all meetings
+            const formattedDate = formatDateForDisplay(dateStr);
+            let message = `📅 Jadwal ${formattedDate}\n\n`;
+
+            dayMeetings.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            dayMeetings.forEach((m, i) => {
+                message += `${i + 1}. ${m.room}\n`;
+                message += `   ⏰ ${m.startTime} - ${m.endTime}\n`;
+                message += `   👤 ${m.pic}\n`;
+                if (m.title) message += `   📝 ${m.title}\n`;
+                message += '\n';
+            });
+
+            alert(message);
         }
     </script>
 </body>
