@@ -1335,7 +1335,8 @@
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 3000;
+            z-index: 3100;
+            /* Increased to be above calendar (3000) */
             animation: fadeIn 0.3s ease;
             backdrop-filter: blur(5px);
         }
@@ -4461,13 +4462,16 @@
                 if (remainingCount > 0) {
                     meetingsHtml += `
                         <div class="calendar-more-meetings" onclick="showDayDetails('${dateStr}')">
+                        <div class="calendar-more-meetings">
                             +${remainingCount} lainnya
                         </div>
                     `;
                 }
 
+                // Add click handler to the whole day cell
                 html += `
-                    <div class="calendar-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''} ${dayMeetings.length > 0 ? 'has-meetings' : ''}">
+                    <div class="calendar-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''} ${dayMeetings.length > 0 ? 'has-meetings' : ''}"
+                         onclick="showDayDetails('${dateStr}')" style="cursor: pointer;">
                         <div class="calendar-day-number">${day}</div>
                         <div class="calendar-meetings">
                             ${meetingsHtml}
@@ -4478,11 +4482,17 @@
 
             // Next month days to complete the grid (always show 6 rows = 42 cells)
             const totalCells = startingDayOfWeek + daysInMonth;
-            const remainingCells = 42 - totalCells;
+            const remainingCells = 42 - totalCells; // 6 rows * 7 days
 
-            for (let day = 1; day <= remainingCells; day++) {
-                const dayOfWeek = (totalCells + day - 1) % 7;
+            for (let i = 1; i <= remainingCells; i++) {
+                const day = i;
+                const dateStr = `${month === 11 ? year + 1 : year}-${String(month === 11 ? 1 : month + 2).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                // Check if next month's day is weekend
+                // Get day of week for this date
+                const nextMonthDate = new Date(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1, day);
+                const dayOfWeek = nextMonthDate.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
                 html += `
                     <div class="calendar-day other-month ${isWeekend ? 'weekend' : ''}">
                         <div class="calendar-day-number">${day}</div>
@@ -4496,6 +4506,8 @@
 
         // Show meeting tooltip on hover
         function showMeetingTooltip(event, encodedData) {
+            // Prevent day click when clicking tooltip area
+            event.stopPropagation();
             try {
                 const meeting = JSON.parse(decodeURIComponent(encodedData));
                 const tooltip = document.getElementById('meetingTooltip');
@@ -4533,7 +4545,8 @@
         }
 
         // Show schedule from calendar (clicking on a meeting pill)
-        function showScheduleFromCalendar(room) {
+        function showScheduleFromCalendar(event, room) {
+            event.stopPropagation();
             closeCalendarView();
             setTimeout(() => {
                 showSchedule(room);
@@ -4542,25 +4555,48 @@
 
         // Show all meetings for a specific day
         function showDayDetails(dateStr) {
+            // Prevent event bubbling if triggered from child elements
+            if (window.event) window.event.stopPropagation();
+
             const dayMeetings = calendarMeetingsData.filter(m => m.date === dateStr);
-
-            if (dayMeetings.length === 0) return;
-
-            // Create an alert or modal with all meetings
             const formattedDate = formatDateForDisplay(dateStr);
-            let message = `📅 Jadwal ${formattedDate}\n\n`;
+
+            const modal = document.getElementById('statsModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+
+            modalTitle.textContent = `Jadwal ${formattedDate}`;
+            modal.classList.add('active'); // Show modal
+
+            if (dayMeetings.length === 0) {
+                modalContent.innerHTML = `
+                    <div class="modal-empty">
+                        <div class="modal-empty-icon">📅</div>
+                        <p>Tidak ada jadwal meeting pada hari ini</p>
+                    </div>
+                `;
+                return;
+            }
 
             dayMeetings.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            dayMeetings.forEach((m, i) => {
-                message += `${i + 1}. ${m.room}\n`;
-                message += `   ⏰ ${m.startTime} - ${m.endTime}\n`;
-                message += `   👤 ${m.pic}\n`;
-                if (m.title) message += `   📝 ${m.title}\n`;
-                message += '\n';
+            let html = '';
+            dayMeetings.forEach(meeting => {
+                const colorClass = getRoomColorClass(meeting.room);
+
+                html += `
+                <div class="modal-item">
+                    <div class="modal-item-text">
+                        <div class="modal-item-name">${meeting.room}</div>
+                        <div class="modal-item-info">⏰ ${meeting.startTime} - ${meeting.endTime}</div>
+                        <div class="modal-item-info">👤 ${meeting.pic}</div>
+                        ${meeting.title ? `<div class="modal-item-info" style="margin-top:4px; font-style:italic;">"${meeting.title}"</div>` : ''}
+                    </div>
+                </div>
+                `;
             });
 
-            alert(message);
+            modalContent.innerHTML = html;
         }
     </script>
 </body>
